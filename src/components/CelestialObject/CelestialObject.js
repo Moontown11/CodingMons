@@ -1,0 +1,1 @@
+export { StyledCelestialObject as default } from "./StyledCelestialObject"
