@@ -59,16 +59,6 @@ export const StyledEarthAndMoonContainer = styled.div`
   }
 `;
 
-export const StyledEarth = styled(CelestialObject)``
-
-export const StyledMoon = styled(CelestialObject)`
-  position: absolute;
-  inset-block-start: 2em;
-  inset-inline-end: 2em;
-  width: 10%;
-  height: 10%;
-`
-
 export const StyledWaveBackground = styled.svg`
   display: none;
   width: 100%;

@@ -8,11 +8,14 @@ import { Header } from "./components/Header/Header";
 
 import Home from "./pages/Home/Home";
 import AboutPage from "./pages/About/About";
+import Map from "./pages/Map/Map";
 
 function App() {
   const location = useLocation();
 
-  useEffect(() => { window.scrollTo(0, 0); }, [location])
+  useEffect(() => {
+     window.scrollTo(0, 0);
+     }, [location])
 
   return (
     <React.Fragment>
@@ -22,6 +25,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/map" element={<Map />} />
         </Routes>
       </Layout>
     </React.Fragment>
