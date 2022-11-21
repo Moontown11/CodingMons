@@ -2,6 +2,7 @@ import GlobalStyles from "./GlobalStyles";
 
 import React, { useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
+import Footer from "./components/Footer/Footer";
 
 import Layout from "./components/Layout/Layout";
 import { Header } from "./components/Header/Header";
@@ -28,6 +29,7 @@ function App() {
           <Route path="/map" element={<Map />} />
         </Routes>
       </Layout>
+      <Footer />
     </React.Fragment>
   );
 }

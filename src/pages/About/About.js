@@ -8,10 +8,10 @@ const AboutPage = () => {
       <PageHeader title="About" />
       <article>
         <AboutP>
-          설명
+          카페 입지를 추천해주는 사이트입니다!
         </AboutP>
         <AboutP>
-          설명2
+          Service 탭에서 원하는 지역을 검색하시고 해당 서비스를 이용해 보세요!
         </AboutP>
       </article>
     </AboutSection>
