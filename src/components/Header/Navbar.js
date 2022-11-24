@@ -17,6 +17,9 @@ const Navbar = () => {
         <Link to="/map" >
           SERVICE
         </Link>
+        <Link to="/test" >
+          TEST
+        </Link>
       </NavbarStyle>
 
     </div>
