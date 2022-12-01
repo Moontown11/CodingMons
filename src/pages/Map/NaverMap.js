@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import {useState} from 'react';
-//import NaverApiMap from "./NaverMap";
 
 const Map = () => {
   
@@ -30,7 +29,9 @@ const Map = () => {
   }, []);
 
 
-  return <div ref={mapElement} style={{minHeight: '700px'}} />;
+  return( 
+    <div ref={mapElement} style={{minWidth: '1200px', minHeight: '700px'}} />
+  );
 };
 
 export default Map;

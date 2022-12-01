@@ -1,0 +1,11 @@
+.MapScreen {
+  display: flex;
+  flex-direction: row; 
+  position: relative; 
+}
+
+.description {
+  position: absolute;
+  width: 500px;
+  height: 700px;
+}

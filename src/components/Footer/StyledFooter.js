@@ -25,7 +25,7 @@ export const StyledFooterRow = styled.div`
   ${(props) => {
     if (props.margin)
       return `
-    margin: 7.3125em 0;
+    margin: 0.3125em 0;
     `;
   }}
   ${(props) => {

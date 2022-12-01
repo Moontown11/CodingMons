@@ -1,0 +1,21 @@
+.content {
+    border: 1px solid rgb(131, 107, 107);
+    padding: 0.5rem;
+    border-radius: 5px;
+}
+    
+.content-parent {
+    height: 0px;
+    overflow: hidden;
+    transition: height ease 0.9s;
+}
+    
+.content-show {
+    height: 600px;
+    width: 400px;
+}
+
+.collapse{
+    background-color: rgb(255, 255, 255 , 0.85);
+    color: black;
+}

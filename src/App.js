@@ -8,7 +8,6 @@ import Layout from "./components/Layout/Layout";
 import { Header } from "./components/Header/Header";
 
 import Home from "./pages/Home/Home";
-import AboutPage from "./pages/About/About";
 import Map from "./pages/Map/Map";
 import Test from "./pages/Test/test";
 
@@ -30,6 +29,7 @@ function App() {
           <Route path="/test" element={<Test />}/>
         </Routes>
       </Layout>
+      <hr />
       <Footer />
     </React.Fragment>
   );
