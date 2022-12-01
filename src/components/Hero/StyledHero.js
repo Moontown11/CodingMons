@@ -6,7 +6,7 @@ import { BackgroundSVG } from "./Hero";
 
 export const StyledSection = styled.section`
   position: relative;
-  min-height: 90vh;
+  min-height: 60vh;
   display: grid;
   align-content: center;
   justify-items: center;

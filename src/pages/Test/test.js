@@ -2,9 +2,10 @@ import React from 'react';
 import axios from 'axios';
 
 const test=()=>{
-    const dbtest=()=>{
+    const dbtest=async()=>{
         alert("Test!!");
-        axios.get('/test_body');
+        const result=await axios.get('/test_body')
+        console.log(result)
     }
 
     return (

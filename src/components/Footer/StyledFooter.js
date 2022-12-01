@@ -12,7 +12,6 @@ export const StyledFooterSection = styled.section`
   flex-direction: column;
   bottom: 0;
   background-color: #141823;
-  padding-top: 5.9375em;
 `;
 
 export const StyledFooterRow = styled.div`
