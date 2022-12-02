@@ -22,10 +22,10 @@ const Map = () => {
     };
     const map = new naver.maps.Map(mapElement.current, mapOptions);
     
-    new naver.maps.Marker({
+    {/*new naver.maps.Marker({
       position: location,
       map,
-    });
+    });*/}
   }, []);
 
 
