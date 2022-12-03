@@ -51,16 +51,14 @@ function Search(props) {
   const selectPlace = (e) => {
     setSelectedPlace(e.target.value);
   }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
-      <button onClick={toggle} className="content">{props.label}</button>
+      <button onClick={toggle} className="content">▶</button>
       {open && (
         <div className="collapse">
           <label>장소: </label>
           <select className="place-select" defaultValue="default" onClick={selectPlace}>
-            <option value="default" disabled>
-              Choose a Place ...
-            </option>
             {[...new Set(Places)].map((mainPlace, key) => (
               <option value={mainPlace} key={key}>{mainPlace}</option>
             ))}
