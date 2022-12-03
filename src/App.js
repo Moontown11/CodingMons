@@ -26,7 +26,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/map" element={<Map />} />
-          <Route path="/test" element={<Test />}/>
+          {/*<Route path="/test" element={<Test />}/>   (테스트 용 페이지)*/}
         </Routes>
       </Layout>
       <hr />
