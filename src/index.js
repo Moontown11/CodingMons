@@ -1,15 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import {BrowserRouter} from "react-router-dom"; 
+import { BrowserRouter } from "react-router-dom";
+import { RenderAfterNavermapsLoaded } from "react-naver-maps";
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
+  <RenderAfterNavermapsLoaded
+    ncpClientId={"Client ID"} // 자신의 네이버 계정에서 발급받은 Client ID
+    error={<p>Maps Load Error</p>}
+    loading={<p>Maps Loading...</p>}
+    submodules={["geocoder"]}>
     <BrowserRouter>
-    <App />
+      <App />
     </BrowserRouter>
+  </RenderAfterNavermapsLoaded>
 );
 
 // If you want to start measuring performance in your app, pass a function

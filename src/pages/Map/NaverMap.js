@@ -3,6 +3,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import './MapStyle.css'
 
+
 const Map = () => {
 
   const mapElement = useRef(null);
@@ -24,7 +25,7 @@ const Map = () => {
 
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [selectedDong, setSelectedDong] = useState(null);
-  const [dongOption, setdongOption] = useState(null);
+  const [dongOption, setdongOption] = useState('');
 
   const tempMain = placeArr.map(place => place.중심장소); //중심장소
   const tempSub = placeArr.map(place => [place.중심장소, place.행정동]); // 중심장소별 행정동
@@ -33,11 +34,20 @@ const Map = () => {
   const tempStore = storeArr.map(dong => [dong.행정동명, dong.기준_년_코드, dong.점포_수]);
   const tempLiving = livingArr.map(dong => [dong.행정동명, dong.기준_년_코드, dong.남자_20대, dong.남자_30대, dong.여자_20대, dong.여자_30대]);
 
-  const [gatherSum,setGatherSum] = useState(0);
+  const [gatherSum, setGatherSum] = useState(0);
+
+  //지도 위치 동적 변경
+  const [{ lat, lng }, setGeometricData] = useState({
+    lat: 37.5656,
+    lng: 126.9769,
+  });
+
+
   var [officeSum_total, setOfficeSum_total] = useState(0);
   var [officeSum_man, setOfficeSum_man] = useState(0);
   var [officeSum_woman, setOfficeSum_woman] = useState(0);
   var [storeSum, setStoreSum] = useState(0);
+  var locStr = useState('');
 
   const Places = tempMain.filter((v, i) => tempMain.indexOf(v) === i); // 중심장소 중복제거
   const SubPlaces = tempSub.filter((element, index) => { //행정동 중복제거
@@ -47,6 +57,13 @@ const Map = () => {
       ) === index
     );
   });
+
+  const changeStr = () => {
+    locStr = selectedDong.toString();
+
+    return locStr
+  }
+
   const toggle = () => {
     setOPen(!open);
   };
@@ -101,37 +118,58 @@ const Map = () => {
     var temp = [temp1, temp2, temp3, temp4]
 
     var sum = 0;
-    temp1.map(name=> sum += name[2])
+    temp1.map(name => sum += name[2])
     setGatherSum(sum)
 
     sum = 0;
-    temp2.map(name=> sum += name[2])
+    temp2.map(name => sum += name[2])
     setOfficeSum_total(sum)
 
     sum = 0;
-    temp2.map(name=> sum += name[3])
+    temp2.map(name => sum += name[3])
     setOfficeSum_man(sum)
 
     sum = 0;
-    temp2.map(name=> sum += name[4])
+    temp2.map(name => sum += name[4])
     setOfficeSum_woman(sum)
 
     sum = 0;
-    temp3.map(name=> sum += name[2])
+    temp3.map(name => sum += name[2])
     setStoreSum(sum)
 
     console.log(gatherSum)
-    
+
     //console.log(temp);
 
     setDetail(temp);
   }
 
   //맵 위치 변경
-  const setLoc = () => {
-    // var newloc = new naver.maps.LatLng(33.3590628, 126.534361);
-    // maps.setCenter(newloc)
-  }
+  const setLoc = (address) => {
+    naver.maps.Service.geocode(
+        {
+            query: address,
+        },
+        function (status, response) {
+            if (status === naver.maps.Service.Status.ERROR) {
+                if (!address) {
+                    return alert('Geocode Error, Please check address');
+                }
+                return alert('Geocode Error, address:' + address);
+            }
+
+            if (response.v2.meta.totalCount === 0) {
+                return alert('No result.');
+            }
+
+            let item = response.v2.addresses[0];
+            setGeometricData({
+                lng: item.x,
+                lat: item.y,
+            });
+        },
+    );
+};
 
   const selectPlace = (e) => {
     setSelectedPlace(e.target.value);
@@ -144,7 +182,7 @@ const Map = () => {
   }
 
 
-  
+
   //구역별 카페 조회
   const getCafes = () => {
 
@@ -152,16 +190,19 @@ const Map = () => {
   console.log(selectedDong)
 
   useEffect(() => {
-    const { naver } = window;
     fetchDB();
-    // fetchGather();
+  }, []);
+
+  useEffect(() => {
+
+    const { naver } = window;
 
     if (!mapElement.current || !naver) return;
 
     // 지도에 표시할 위치의 위도와 경도 좌표를 파라미터로 넣어줍니다.
     const location = naver.maps.LatLng(37.5656, 126.9769); //추후에 유저의 현재위치 기반으로 바꾸던가 함
     const mapOptions: naver.maps.MapOptions = {
-      center: location,
+      center: { lat: lat, lng: lng },
       zoom: 17,
       zoomControl: true,
       zoomControlOptions: {
@@ -170,12 +211,12 @@ const Map = () => {
     };
     const map = new naver.maps.Map(mapElement.current, mapOptions);
 
-    //마커 표시
-    {/*new naver.maps.Marker({
-      position: location,
+    new naver.maps.Marker({
+      position: { lat: lat, lng: lng },
       map,
-    });*/}
-  }, []);
+    });
+
+  })
 
 
   return (
@@ -200,20 +241,20 @@ const Map = () => {
               ))}
             </select>
 
-            {/* 검색시 구역별 정보 가져오기*/}  
+            {/* 검색시 구역별 정보 가져오기*/}
             <button value={dongOption} onClick={() => {
               getDetail()
-              setLoc()
-              }} className="searchButton"> 검색 </button>
+              setLoc(changeStr())
+            }} className="searchButton"> 검색 </button>
 
             <br></br>
             <div className={open ? "content-show" : "content-parent"} >
               <h2>집객 시설 수</h2>
-              <h4>2022년 평균 : {gatherSum/2}개</h4>
+              <h4>2022년 평균 : {gatherSum / 2}개</h4>
               <hr />
 
               <h2>점포수</h2>
-              <h4>2022년 평균 : {storeSum/2}개</h4>
+              <h4>2022년 평균 : {storeSum / 2}개</h4>
               <hr />
 
               <h2>직장 인구수</h2>
