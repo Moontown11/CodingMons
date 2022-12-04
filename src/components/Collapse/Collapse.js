@@ -16,6 +16,7 @@ function Search(props) {
     setOPen(!open);
   };
 
+  
   const getDetail = () => {
 
 
