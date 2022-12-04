@@ -7,6 +7,7 @@ const Map = () => {
 
   const mapElement = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [detail, setDetail] = useState([]);
 
   const [open, setOPen] = useState(false);
 
@@ -27,12 +28,16 @@ const Map = () => {
 
   const tempMain = placeArr.map(place => place.중심장소); //중심장소
   const tempSub = placeArr.map(place => [place.중심장소, place.행정동]); // 중심장소별 행정동
-  const tempGather = gatherArr.map(dong => [dong.행정동명, dong.기준_년_코드, dong.기준_분기_코드, dong.집객시설_수]);
+  const tempGather = gatherArr.map(dong => [dong.행정동명, dong.기준_년_코드, dong.집객시설_수]);
   const tempOffice = officeArr.map(dong => [dong.행정동명, dong.기준_년_코드, dong.총_직장_인구_수, dong.남성_직장_인구_수, dong.여성_직장_인구_수]);
   const tempStore = storeArr.map(dong => [dong.행정동명, dong.기준_년_코드, dong.점포_수]);
   const tempLiving = livingArr.map(dong => [dong.행정동명, dong.기준_년_코드, dong.남자_20대, dong.남자_30대, dong.여자_20대, dong.여자_30대]);
 
-  console.log(tempLiving)
+  const [gatherSum,setGatherSum] = useState(0);
+  var [officeSum_total, setOfficeSum_total] = useState(0);
+  var [officeSum_man, setOfficeSum_man] = useState(0);
+  var [officeSum_woman, setOfficeSum_woman] = useState(0);
+  var [storeSum, setStoreSum] = useState(0);
 
   const Places = tempMain.filter((v, i) => tempMain.indexOf(v) === i); // 중심장소 중복제거
   const SubPlaces = tempSub.filter((element, index) => { //행정동 중복제거
@@ -74,9 +79,9 @@ const Map = () => {
       setStore(response4.data);
       console.log('fetch store');
 
-      const response5 = await axios.get('/living_info');
-      setLiving(response5.data);
-      console.log('fetch living');
+      // const response5 = await axios.get('/living_info');
+      // setLiving(response5.data);
+      // console.log('fetch living');
 
 
     } catch (e) {
@@ -88,15 +93,44 @@ const Map = () => {
   //구역별 정보 조회
   const getDetail = () => {
 
-    const temp1 = tempGather.filter(name => name[0] === selectedDong && name[1] === 2022)
-    const temp2 = tempOffice.filter(name => name[0] === selectedDong && name[1] === 2022)
-    const temp3 = tempStore.filter(name => name[0] === selectedDong && name[1] === 2022)
-    const temp4 = tempLiving.filter(name => name[0] === selectedDong && name[1] === 2022)
-    const detail = [temp1, temp2, temp3, temp4]
+    var temp1 = tempGather.filter(name => name[0] === selectedDong && name[1] === 2022)
+    var temp2 = tempOffice.filter(name => name[0] === selectedDong && name[1] === 2022)
+    var temp3 = tempStore.filter(name => name[0] === selectedDong && name[1] === 2022)
+    var temp4 = tempLiving.filter(name => name[0] === selectedDong && name[1] === 2022)
 
-    console.log(detail);
+    var temp = [temp1, temp2, temp3, temp4]
 
-    return detail;
+    var sum = 0;
+    temp1.map(name=> sum += name[2])
+    setGatherSum(sum)
+
+    sum = 0;
+    temp2.map(name=> sum += name[2])
+    setOfficeSum_total(sum)
+
+    sum = 0;
+    temp2.map(name=> sum += name[3])
+    setOfficeSum_man(sum)
+
+    sum = 0;
+    temp2.map(name=> sum += name[4])
+    setOfficeSum_woman(sum)
+
+    sum = 0;
+    temp3.map(name=> sum += name[2])
+    setStoreSum(sum)
+
+    console.log(gatherSum)
+    
+    //console.log(temp);
+
+    setDetail(temp);
+  }
+
+  //맵 위치 변경
+  const setLoc = () => {
+    // var newloc = new naver.maps.LatLng(33.3590628, 126.534361);
+    // maps.setCenter(newloc)
   }
 
   const selectPlace = (e) => {
@@ -125,7 +159,7 @@ const Map = () => {
     if (!mapElement.current || !naver) return;
 
     // 지도에 표시할 위치의 위도와 경도 좌표를 파라미터로 넣어줍니다.
-    const location = new naver.maps.LatLng(37.5656, 126.9769); //추후에 유저의 현재위치 기반으로 바꾸던가 함
+    const location = naver.maps.LatLng(37.5656, 126.9769); //추후에 유저의 현재위치 기반으로 바꾸던가 함
     const mapOptions: naver.maps.MapOptions = {
       center: location,
       zoom: 17,
@@ -167,22 +201,25 @@ const Map = () => {
             </select>
 
             {/* 검색시 구역별 정보 가져오기*/}  
-            <button value={dongOption} onClick={getDetail} className="searchButton"> 검색 </button>
-            
-            
+            <button value={dongOption} onClick={() => {
+              getDetail()
+              setLoc()
+              }} className="searchButton"> 검색 </button>
 
             <br></br>
             <div className={open ? "content-show" : "content-parent"} >
               <h2>집객 시설 수</h2>
-              <h6>여기에 db내용 가져오기</h6>
+              <h4>2022년 평균 : {gatherSum/2}개</h4>
               <hr />
 
               <h2>점포수</h2>
-              <h6>여기에 db내용 가져오기</h6>
+              <h4>2022년 평균 : {storeSum/2}개</h4>
               <hr />
 
-              <h2>총 직장 인구수</h2>
-              <h6>여기에 db내용 가져오기</h6>
+              <h2>직장 인구수</h2>
+              <h4>2022년 평균 직장인구수(총): {officeSum_total / 2} 명</h4>
+              <h4>2022년 평균 직장인구수(남성): {officeSum_man / 2} 명</h4>
+              <h4>2022년 평균 직장인구수(여성): {officeSum_woman / 2} 명</h4>
 
             </div>
           </div>
