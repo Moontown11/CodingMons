@@ -188,17 +188,17 @@ const Map = () => {
   const getCafeLoc = () => {
     var temp = tempCafes.filter(name => name[0] === selectedDong) // 카페들 정보 배열
     var temploc = temp.map(name => name[1].toString()) // 카페들 주소 배열
-    var temploc2 = [];
-
     console.log(temploc)
+    console.log(temploc.length)
+
+    var temploc2 = [lat, lng];
+
     // temploc.map(name => getCafeLoc2(name))
     for(var i = 0; i<temploc.length; i++){
-      temploc2[i] = getCafeLoc2(temploc[i])
+      console.log(temploc[i])
+      temploc2 = temploc2.concat(getCafeLoc2(temploc[i].toString()))
     }
     console.log(temploc2);
-
-
-
   }
 
   const getCafeLoc2 = (address) => {
@@ -223,6 +223,7 @@ const Map = () => {
         let item = response.v2.addresses[0];
         var temp = { lat: item.y, lng: item.x }
 
+        console.log(temp)
         return temp;
         // console.log(temp)
         //setMarkers([...Markers, temp])
@@ -262,10 +263,10 @@ const Map = () => {
     };
     const map = new naver.maps.Map(mapElement.current, mapOptions);
 
-    for (var i = 1, ii= Markers.length; i<ii; i++){
+    for (var i = 1, j= Markers.length; i<j; i++){
       console.log(i);
       new naver.maps.Marker({
-        position: {lat: 37 + i/10, lng: 126 + i/10},
+        position: {lat: Markers[i].lat, lng: Markers[i].lng},
         map,
       })
       
