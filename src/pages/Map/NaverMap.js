@@ -27,14 +27,14 @@ const Map = () => {
   const [selectedDong, setSelectedDong] = useState(null);
   const [dongOption, setdongOption] = useState('');
 
+
   const tempMain = placeArr.map(place => place.중심장소); //중심장소
   const tempSub = placeArr.map(place => [place.중심장소, place.행정동]); // 중심장소별 행정동
+  const tempCafes = placeArr.map(place => [place.행정동, place.주소, place.카페명, place.카페타입, place.별점]) //행정동별 카페
   const tempGather = gatherArr.map(dong => [dong.행정동명, dong.기준_년_코드, dong.집객시설_수]);
   const tempOffice = officeArr.map(dong => [dong.행정동명, dong.기준_년_코드, dong.총_직장_인구_수, dong.남성_직장_인구_수, dong.여성_직장_인구_수]);
   const tempStore = storeArr.map(dong => [dong.행정동명, dong.기준_년_코드, dong.점포_수]);
   const tempLiving = livingArr.map(dong => [dong.행정동명, dong.기준_년_코드, dong.남자_20대, dong.남자_30대, dong.여자_20대, dong.여자_30대]);
-
-  const [gatherSum, setGatherSum] = useState(0);
 
   //지도 위치 동적 변경
   const [{ lat, lng }, setGeometricData] = useState({
@@ -42,11 +42,15 @@ const Map = () => {
     lng: 126.9769,
   });
 
+  const [locSet, setLocSet] = useState({
+    lat,lng
+  });
 
-  var [officeSum_total, setOfficeSum_total] = useState(0);
-  var [officeSum_man, setOfficeSum_man] = useState(0);
-  var [officeSum_woman, setOfficeSum_woman] = useState(0);
-  var [storeSum, setStoreSum] = useState(0);
+  const [gatherSum, setGatherSum] = useState(0);
+  const [officeSum_total, setOfficeSum_total] = useState(0);
+  const [officeSum_man, setOfficeSum_man] = useState(0);
+  const [officeSum_woman, setOfficeSum_woman] = useState(0);
+  const [storeSum, setStoreSum] = useState(0);
   var locStr = useState('');
 
   const Places = tempMain.filter((v, i) => tempMain.indexOf(v) === i); // 중심장소 중복제거
@@ -109,7 +113,6 @@ const Map = () => {
 
   //구역별 정보 조회
   const getDetail = () => {
-
     var temp1 = tempGather.filter(name => name[0] === selectedDong && name[1] === 2022)
     var temp2 = tempOffice.filter(name => name[0] === selectedDong && name[1] === 2022)
     var temp3 = tempStore.filter(name => name[0] === selectedDong && name[1] === 2022)
@@ -147,29 +150,30 @@ const Map = () => {
   //맵 위치 변경
   const setLoc = (address) => {
     naver.maps.Service.geocode(
-        {
-            query: address,
-        },
-        function (status, response) {
-            if (status === naver.maps.Service.Status.ERROR) {
-                if (!address) {
-                    return alert('Geocode Error, Please check address');
-                }
-                return alert('Geocode Error, address:' + address);
-            }
+      {
+        query: address,
+      },
+      function (status, response) {
+        if (status === naver.maps.Service.Status.ERROR) {
+          if (!address) {
+            return alert('Geocode Error, Please check address');
+          }
+          return alert('Geocode Error, address:' + address);
+        }
 
-            if (response.v2.meta.totalCount === 0) {
-                return alert('No result.');
-            }
+        if (response.v2.meta.totalCount === 0) {
+          return alert('No result.');
+        }
 
-            let item = response.v2.addresses[0];
-            setGeometricData({
-                lng: item.x,
-                lat: item.y,
-            });
-        },
+        let item = response.v2.addresses[0];
+        setGeometricData({
+          lng: item.x,
+          lat: item.y,
+        });
+      },
     );
-};
+  };
+
 
   const selectPlace = (e) => {
     setSelectedPlace(e.target.value);
@@ -181,18 +185,58 @@ const Map = () => {
     setSelectedDong(e.target.value);
   }
 
+  //카페 위치 찾기
+  const getCafeLoc = () => {
+    var temp = tempCafes.filter(name => name[0] === selectedDong) // 카페들 정보 배열
+    var temploc = temp.map(name => name[1].toString()) // 카페들 주소 배열
 
+    console.log(temploc)
+    temploc.map(name => getCafeLoc2(name))
 
+  }
+
+  const getCafeLoc2 = (address) => {
+    naver.maps.Service.geocode(
+      {
+        query: address,
+      },
+      
+      function (status, response) {
+        console.log(address)
+        if (status === naver.maps.Service.Status.ERROR) {
+          if (!address) {
+            return alert('Geocode Error, Please check address');
+          }
+          return alert('Geocode Error, address:' + address);
+        }
+
+        if (response.v2.meta.totalCount === 0) {
+          return alert('No result.');
+        }
+
+        let item = response.v2.addresses[0];
+        var temp = {lng: item.x, lat: item.y}
+        console.log(temp)
+        
+        //setLocSet([...locSet, temp]);
+      },
+    );
+
+  }
+
+  console.log(locSet);
   //구역별 카페 조회
   const getCafes = () => {
 
   }
   console.log(selectedDong)
 
+  //DB fetch
   useEffect(() => {
     fetchDB();
   }, []);
 
+  //Map Load
   useEffect(() => {
 
     const { naver } = window;
@@ -200,10 +244,9 @@ const Map = () => {
     if (!mapElement.current || !naver) return;
 
     // 지도에 표시할 위치의 위도와 경도 좌표를 파라미터로 넣어줍니다.
-    const location = naver.maps.LatLng(37.5656, 126.9769); //추후에 유저의 현재위치 기반으로 바꾸던가 함
     const mapOptions: naver.maps.MapOptions = {
       center: { lat: lat, lng: lng },
-      zoom: 17,
+      zoom: 14,
       zoomControl: true,
       zoomControlOptions: {
         position: naver.maps.Position.TOP_RIGHT,
@@ -245,6 +288,8 @@ const Map = () => {
             <button value={dongOption} onClick={() => {
               getDetail()
               setLoc(changeStr())
+              getCafes()
+              getCafeLoc()
             }} className="searchButton"> 검색 </button>
 
             <br></br>
