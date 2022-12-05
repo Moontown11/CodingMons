@@ -42,9 +42,11 @@ const Map = () => {
     lng: 126.9769,
   });
 
-  const [locSet, setLocSet] = useState({
-    lat,lng
-  });
+  //const [locSet, setLocSet] = useState({
+  //   lat,lng
+  // });
+
+  const [Markers,setMarkers] = useState([lat, lng]);
 
   const [gatherSum, setGatherSum] = useState(0);
   const [officeSum_total, setOfficeSum_total] = useState(0);
@@ -139,9 +141,6 @@ const Map = () => {
     sum = 0;
     temp3.map(name => sum += name[2])
     setStoreSum(sum)
-
-    console.log(gatherSum)
-
     //console.log(temp);
 
     setDetail(temp);
@@ -189,9 +188,16 @@ const Map = () => {
   const getCafeLoc = () => {
     var temp = tempCafes.filter(name => name[0] === selectedDong) // 카페들 정보 배열
     var temploc = temp.map(name => name[1].toString()) // 카페들 주소 배열
+    var temploc2 = [];
 
     console.log(temploc)
-    temploc.map(name => getCafeLoc2(name))
+    // temploc.map(name => getCafeLoc2(name))
+    for(var i = 0; i<temploc.length; i++){
+      temploc2[i] = getCafeLoc2(temploc[i])
+    }
+    console.log(temploc2);
+
+
 
   }
 
@@ -200,7 +206,7 @@ const Map = () => {
       {
         query: address,
       },
-      
+
       function (status, response) {
         console.log(address)
         if (status === naver.maps.Service.Status.ERROR) {
@@ -215,16 +221,18 @@ const Map = () => {
         }
 
         let item = response.v2.addresses[0];
-        var temp = {lng: item.x, lat: item.y}
-        console.log(temp)
-        
-        //setLocSet([...locSet, temp]);
+        var temp = { lat: item.y, lng: item.x }
+
+        return temp;
+        // console.log(temp)
+        //setMarkers([...Markers, temp])
+        // Markers.concat(temp)
       },
     );
 
   }
 
-  console.log(locSet);
+
   //구역별 카페 조회
   const getCafes = () => {
 
@@ -254,10 +262,39 @@ const Map = () => {
     };
     const map = new naver.maps.Map(mapElement.current, mapOptions);
 
+    for (var i = 1, ii= Markers.length; i<ii; i++){
+      console.log(i);
+      new naver.maps.Marker({
+        position: {lat: 37 + i/10, lng: 126 + i/10},
+        map,
+      })
+      
+    }
+    console.log(Markers)
+
+    // new naver.maps.Marker({
+    //   position: { lat:37.5321534 , lng: 127.0756284 },
+    //   map,
+    // });
+
     new naver.maps.Marker({
-      position: { lat: lat, lng: lng },
+    position: { lat: lat, lng: lng },
       map,
     });
+
+    // var markerOptions = {
+    //   position: new naver.maps.LatLng(Markers.lat, Markers.lng), //마커찍을 좌표
+    //   map: map,
+    //   icon: {
+    //     url: '../../assets/img/mapmarker.png', //아이콘 경로
+    //     size: new naver.maps.Size(22, 36), //아이콘 크기
+    //     origin: new naver.maps.Point(0, 0),
+    //     anchor: new naver.maps.Point(11, 35)
+    //   }
+    // };
+
+    // var marker = new naver.maps.Marker(markerOptions);
+
 
   })
 
