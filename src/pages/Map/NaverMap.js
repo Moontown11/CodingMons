@@ -42,11 +42,8 @@ const Map = () => {
     lng: 126.9769,
   });
 
-  //const [locSet, setLocSet] = useState({
-  //   lat,lng
-  // });
-
-  const [Markers,setMarkers] = useState([lat, lng]);
+  // const [Markers,setMarkers] = useState([[]]);
+  const [Markers,setMarkers] = useState([]);
 
   const [gatherSum, setGatherSum] = useState(0);
   const [officeSum_total, setOfficeSum_total] = useState(0);
@@ -184,53 +181,90 @@ const Map = () => {
     setSelectedDong(e.target.value);
   }
 
+//카페 주소 좌표로 바꾸기
+// const getCafeLoc2 = (address) => {
+//   naver.maps.Service.geocode(
+//     {
+//       query: address,
+//     },
+
+//     function (status, response) {
+//       if (status === naver.maps.Service.Status.ERROR) {
+//         if (!address) {
+//           return alert('Geocode Error, Please check address');
+//         }
+//         return alert('Geocode Error, address:' + address);
+//       }
+
+//       if (response.v2.meta.totalCount === 0) {
+//         return alert('No result.');
+//       }
+
+//       let item = response.v2.addresses[0];
+//       var temp = { lat: item.y, lng: item.x }
+
+//       console.log(temp)
+//       return (temp);
+//       // console.log(temp)
+//       //setMarkers([...Markers, temp])
+//       // Markers.concat(temp)
+//     },
+//   );
+
+// }
+
   //카페 위치 찾기
   const getCafeLoc = () => {
     var temp = tempCafes.filter(name => name[0] === selectedDong) // 카페들 정보 배열
     var temploc = temp.map(name => name[1].toString()) // 카페들 주소 배열
     console.log(temploc)
-    console.log(temploc.length)
-
-    var temploc2 = [lat, lng];
 
     // temploc.map(name => getCafeLoc2(name))
     for(var i = 0; i<temploc.length; i++){
-      console.log(temploc[i])
-      temploc2 = temploc2.concat(getCafeLoc2(temploc[i].toString()))
-    }
-    console.log(temploc2);
-  }
+      console.log(temploc.length)
 
-  const getCafeLoc2 = (address) => {
-    naver.maps.Service.geocode(
-      {
-        query: address,
-      },
-
-      function (status, response) {
-        console.log(address)
-        if (status === naver.maps.Service.Status.ERROR) {
-          if (!address) {
-            return alert('Geocode Error, Please check address');
+      naver.maps.Service.geocode(
+        {
+          query: temploc[i],
+        },
+    
+        function (status, response) {
+          if (status === naver.maps.Service.Status.ERROR) {
+            if (!temploc[i]) {
+              return alert('Geocode Error, Please check address');
+            }
+            return alert('Geocode Error, address:' + temploc[i]);
           }
-          return alert('Geocode Error, address:' + address);
-        }
+    
+          if (response.v2.meta.totalCount === 0) {
+            return alert('No result.');
+          }
+    
+          let item = response.v2.addresses[0];
+          const temploc2 = {lt: item.y, lg: item.x}
+          // var lt= item.y 
+          // var lg= item.x
+          //setMarkers(Markers.concat(temploc2));
+          new naver.maps.Marker({
+              position: { lat: temploc2.lt, lng: temploc2.lg },
+              map: mapElement.current,
+            });
+          
+          //setMarkers([...Markers, temploc2])
+          //console.log(temploc2)
 
-        if (response.v2.meta.totalCount === 0) {
-          return alert('No result.');
-        }
-
-        let item = response.v2.addresses[0];
-        var temp = { lat: item.y, lng: item.x }
-
-        console.log(temp)
-        return temp;
-        // console.log(temp)
-        //setMarkers([...Markers, temp])
-        // Markers.concat(temp)
-      },
-    );
-
+          //Markers = [{lt, lg}, ...Markers]
+          //setMarkers([...Markers, temploc2])
+          // Markers.concat(temploc2)
+        },
+      );
+        console.log(Markers)
+        
+      // temparr = getCafeLoc2(temploc[i].toString()) //카페 주소들 좌표로 바꿔서 저장
+      // console.log(temparr)
+      //setMarkers(temparr[0], temparr[1])
+    }
+    //console.log(Markers);
   }
 
 
@@ -262,26 +296,24 @@ const Map = () => {
       },
     };
     const map = new naver.maps.Map(mapElement.current, mapOptions);
+    console.log("Map Deployed")
 
-    for (var i = 1, j= Markers.length; i<j; i++){
-      console.log(i);
-      new naver.maps.Marker({
-        position: {lat: Markers[i].lat, lng: Markers[i].lng},
-        map,
-      })
+    // for (var i = 1, j= Markers.length; i<j; i++){
+    //   console.log(i);
+    //   console.log(Markers.length)
+    //   new naver.maps.Marker({
+    //     position: {lat: Markers[i][0], lng: Markers[i][1]},
+    //     map,
+    //   })
       
-    }
+    // }
     console.log(Markers)
-
-    // new naver.maps.Marker({
-    //   position: { lat:37.5321534 , lng: 127.0756284 },
-    //   map,
-    // });
-
+    
     new naver.maps.Marker({
     position: { lat: lat, lng: lng },
       map,
     });
+    getCafeLoc()
 
     // var markerOptions = {
     //   position: new naver.maps.LatLng(Markers.lat, Markers.lng), //마커찍을 좌표
