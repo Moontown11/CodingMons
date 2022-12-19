@@ -1,4 +1,9 @@
 import React, { useEffect, useRef } from "react";
+import {
+  RenderAfterNavermapsLoaded,
+  NaverMap,
+  Marker,
+} from 'react-naver-maps';
 import { useState } from 'react';
 import axios from 'axios';
 import './MapStyle.css'
@@ -42,8 +47,9 @@ const Map = () => {
     lng: 126.9769,
   });
 
-  // const [Markers,setMarkers] = useState([[]]);
-  const [Markers,setMarkers] = useState([]);
+  const [markers, setmarkers] = useState([])
+  const array = [];
+  const infoWindows = [];
 
   const [gatherSum, setGatherSum] = useState(0);
   const [officeSum_total, setOfficeSum_total] = useState(0);
@@ -181,48 +187,17 @@ const Map = () => {
     setSelectedDong(e.target.value);
   }
 
-//카페 주소 좌표로 바꾸기
-// const getCafeLoc2 = (address) => {
-//   naver.maps.Service.geocode(
-//     {
-//       query: address,
-//     },
 
-//     function (status, response) {
-//       if (status === naver.maps.Service.Status.ERROR) {
-//         if (!address) {
-//           return alert('Geocode Error, Please check address');
-//         }
-//         return alert('Geocode Error, address:' + address);
-//       }
-
-//       if (response.v2.meta.totalCount === 0) {
-//         return alert('No result.');
-//       }
-
-//       let item = response.v2.addresses[0];
-//       var temp = { lat: item.y, lng: item.x }
-
-//       console.log(temp)
-//       return (temp);
-//       // console.log(temp)
-//       //setMarkers([...Markers, temp])
-//       // Markers.concat(temp)
-//     },
-//   );
-
-// }
 
   //카페 위치 찾기
   const getCafeLoc = () => {
     var temp = tempCafes.filter(name => name[0] === selectedDong) // 카페들 정보 배열
     var temploc = temp.map(name => name[1].toString()) // 카페들 주소 배열
-    console.log(temploc)
+    
 
     // temploc.map(name => getCafeLoc2(name))
     for(var i = 0; i<temploc.length; i++){
-      console.log(temploc.length)
-
+      const cells = [];
       naver.maps.Service.geocode(
         {
           query: temploc[i],
@@ -241,32 +216,24 @@ const Map = () => {
           }
     
           let item = response.v2.addresses[0];
-          const temploc2 = {lt: item.y, lg: item.x}
-          // var lt= item.y 
-          // var lg= item.x
-          //setMarkers(Markers.concat(temploc2));
-          new naver.maps.Marker({
-              position: { lat: temploc2.lt, lng: temploc2.lg },
-              map: mapElement.current,
-            });
-          
-          //setMarkers([...Markers, temploc2])
-          //console.log(temploc2)
 
-          //Markers = [{lt, lg}, ...Markers]
-          //setMarkers([...Markers, temploc2])
-          // Markers.concat(temploc2)
+          
+          cells.push(item.y, item.x);
+          infoWindows.push(new naver.maps.InfoWindow({
+            content: '<div style="width:150px;text-align:center;padding:10px;">The Letter is temp. "</div>'
+        }))
+
         },
       );
-        console.log(Markers)
         
-      // temparr = getCafeLoc2(temploc[i].toString()) //카페 주소들 좌표로 바꿔서 저장
-      // console.log(temparr)
-      //setMarkers(temparr[0], temparr[1])
-    }
-    //console.log(Markers);
-  }
 
+      array.push(cells);
+    }
+    
+    console.log(array)
+
+    setmarkers(array);
+  }
 
   //구역별 카페 조회
   const getCafes = () => {
@@ -289,7 +256,7 @@ const Map = () => {
     // 지도에 표시할 위치의 위도와 경도 좌표를 파라미터로 넣어줍니다.
     const mapOptions: naver.maps.MapOptions = {
       center: { lat: lat, lng: lng },
-      zoom: 14,
+      zoom: 16,
       zoomControl: true,
       zoomControlOptions: {
         position: naver.maps.Position.TOP_RIGHT,
@@ -297,23 +264,24 @@ const Map = () => {
     };
     const map = new naver.maps.Map(mapElement.current, mapOptions);
     console.log("Map Deployed")
-
-    // for (var i = 1, j= Markers.length; i<j; i++){
-    //   console.log(i);
-    //   console.log(Markers.length)
-    //   new naver.maps.Marker({
-    //     position: {lat: Markers[i][0], lng: Markers[i][1]},
-    //     map,
-    //   })
-      
-    // }
-    console.log(Markers)
     
     new naver.maps.Marker({
-    position: { lat: lat, lng: lng },
-      map,
-    });
-    getCafeLoc()
+      position: { lat: lat, lng: lng },
+        map,
+      });
+  
+      console.log(markers)
+
+    //카페위치 마커찍기
+    setTimeout(function() {
+        for(var i = 0; i<markers.length; i++){
+          new naver.maps.Marker({
+            position: { lat: markers[i][0], lng: markers[i][1] },
+              map,
+            });
+
+        }
+    }, 100);
 
     // var markerOptions = {
     //   position: new naver.maps.LatLng(Markers.lat, Markers.lng), //마커찍을 좌표
