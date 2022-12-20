@@ -11,6 +11,7 @@ import './MapStyle.css'
 
 const Map = () => {
 
+  const [mapdraw,setMapdraw] = useState(null);
   const mapElement = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [detail, setDetail] = useState([]);
@@ -226,8 +227,11 @@ const Map = () => {
         },
       );
         
-
+      var infoWindow = new naver.maps.InfoWindow({
+        content: '<div style="width:200px;text-align:center;padding:10px;"><b>test</b><br> - 네이버 지도 - </div>'
+ }); // 클릭했을 때 띄워줄 정보 입력
       array.push(cells);
+      infoWindows.push(infoWindow)
     }
     
     console.log(array)
@@ -239,7 +243,21 @@ const Map = () => {
   const getCafes = () => {
 
   }
-  console.log(selectedDong)
+
+    function getClickHandler(seq) {
+          
+      return function(e) {  // 마커를 클릭하는 부분
+          var marker = markers[seq], // 클릭한 마커의 시퀀스로 찾는다.
+              infoWindow = infoWindows[seq]; // 클릭한 마커의 시퀀스로 찾는다
+
+          if (infoWindow.getMap()) {
+              infoWindow.close();
+          } else {
+              infoWindow.open(mapdraw, marker); // 표출
+          }
+    }
+  }
+
 
   //DB fetch
   useEffect(() => {
@@ -269,8 +287,6 @@ const Map = () => {
       position: { lat: lat, lng: lng },
         map,
       });
-  
-      console.log(markers)
 
     //카페위치 마커찍기
     setTimeout(function() {
@@ -283,19 +299,11 @@ const Map = () => {
         }
     }, 100);
 
-    // var markerOptions = {
-    //   position: new naver.maps.LatLng(Markers.lat, Markers.lng), //마커찍을 좌표
-    //   map: map,
-    //   icon: {
-    //     url: '../../assets/img/mapmarker.png', //아이콘 경로
-    //     size: new naver.maps.Size(22, 36), //아이콘 크기
-    //     origin: new naver.maps.Point(0, 0),
-    //     anchor: new naver.maps.Point(11, 35)
+    // for (var i=0, ii=markers.length; i<ii; i++) {
+    //   console.log(markers[i] , getClickHandler(i));
+    //     naver.maps.Event.addListener(markers[i], 'click', getClickHandler(i)); // 클릭한 마커 핸들러
     //   }
-    // };
-
-    // var marker = new naver.maps.Marker(markerOptions);
-
+    
 
   })
 
